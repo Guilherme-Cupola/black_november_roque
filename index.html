@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrossel Black November</title>
+<script src="assets/assets.js"></script>
+<style>
+  :root{
+    --roxo:#5e113f; --roxo-2:#3d0a29; --roxo-3:#2a061c; --fundo:#17030f;
+    --amarelo:#fdb913; --magenta:#d24bd8; --laranja:#ff8a1f;
+    --texto:#f7eef3; --texto-2:#c9b3c0; --borda:rgba(253,185,19,.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--fundo);color:var(--texto);font-family:PoppinsBN,system-ui,sans-serif}
+  body{min-height:100vh;background:
+      radial-gradient(1200px 500px at 15% -10%,rgba(210,75,216,.18),transparent 60%),
+      radial-gradient(900px 500px at 100% 0%,rgba(255,138,31,.12),transparent 60%),var(--fundo)}
+  button,input,select,textarea{font:inherit;color:inherit}
+  header{display:flex;gap:24px;align-items:center;padding:18px 28px;border-bottom:1px solid var(--borda);
+    background:linear-gradient(180deg,rgba(94,17,63,.55),rgba(23,3,15,.2))}
+  header img{height:74px;filter:drop-shadow(0 0 18px rgba(210,75,216,.35))}
+  header h1{margin:0;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amarelo)}
+  header p{margin:2px 0 0;font-size:13px;color:var(--texto-2)}
+  .busca{flex:1;display:flex;gap:10px;max-width:880px;margin-left:auto}
+  .busca input{flex:1;min-width:0;padding:14px 18px;border-radius:999px;border:2px solid var(--borda);
+    background:rgba(0,0,0,.35);outline:none;font-size:14px}
+  .busca input:focus{border-color:var(--amarelo)}
+  .btn{border:0;border-radius:999px;padding:12px 22px;font-weight:700;cursor:pointer;white-space:nowrap;
+    background:var(--amarelo);color:var(--roxo);transition:transform .1s,filter .15s}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.5;cursor:wait}
+  .btn.sec{background:transparent;color:var(--amarelo);border:2px solid var(--amarelo);padding:10px 18px}
+  .btn.peq{padding:7px 14px;font-size:12px}
+  .aviso{margin:14px 28px 0;padding:12px 16px;border-radius:12px;font-size:13px;display:none;line-height:1.5}
+  .aviso.on{display:block}
+  .aviso.info{background:rgba(253,185,19,.1);border:1px solid var(--borda);color:var(--texto-2)}
+  .aviso.erro{background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.4)}
+  .aviso.ok{background:rgba(80,220,140,.1);border:1px solid rgba(80,220,140,.35)}
+  .aviso textarea{width:100%;height:110px;margin:10px 0;border-radius:10px;border:1px solid var(--borda);
+    background:rgba(0,0,0,.4);padding:10px;font-size:12px;font-family:ui-monospace,monospace}
+  code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:6px}
+
+  main{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;padding:20px 28px 40px;align-items:start}
+  @media (max-width:1100px){main{grid-template-columns:1fr}}
+  .painel-titulo{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .painel-titulo h2{margin:0;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--amarelo)}
+  .painel-titulo .sp{flex:1}
+  .painel-titulo small{color:var(--texto-2)}
+
+  .trilho{display:flex;gap:18px;overflow-x:auto;padding:6px 4px 18px;scroll-snap-type:x mandatory}
+  .trilho::-webkit-scrollbar{height:10px} .trilho::-webkit-scrollbar-thumb{background:var(--roxo);border-radius:9px}
+  .card{flex:none;width:min(340px,78vw);scroll-snap-align:start}
+  .card canvas{display:block;width:100%;height:auto;border-radius:14px;cursor:grab;touch-action:none;
+    box-shadow:0 14px 40px rgba(0,0,0,.5);outline:3px solid transparent;outline-offset:3px;transition:outline-color .15s}
+  .card canvas:active{cursor:grabbing}
+  .card.sel canvas{outline-color:var(--amarelo)}
+  .card .rodape{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--texto-2)}
+  .card .rodape b{color:var(--texto)} .card .rodape .sp{flex:1}
+  .dica{font-size:12px;color:var(--texto-2);margin:4px 0 0}
+
+  aside{display:flex;flex-direction:column;gap:16px;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:4px}
+  @media (max-width:1100px){aside{position:static;max-height:none}}
+  .bloco{background:linear-gradient(180deg,rgba(94,17,63,.45),rgba(61,10,41,.35));border:1px solid var(--borda);
+    border-radius:16px;padding:16px 16px 18px}
+  .bloco h3{margin:0 0 12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amarelo)}
+  .campos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .campo{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .campo.full{grid-column:1/-1}
+  .campo label{font-size:11px;color:var(--texto-2);letter-spacing:.04em}
+  .campo input,.campo select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.35);outline:none;font-size:14px}
+  .campo input:focus,.campo select:focus{border-color:var(--amarelo)}
+  .campo small{font-size:11px;color:var(--texto-2)}
+
+  .lista{display:flex;flex-direction:column;gap:8px}
+  .item{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:12px;
+    background:rgba(0,0,0,.25);border:1px solid transparent;cursor:pointer}
+  .item.sel{border-color:var(--amarelo)}
+  .item img{width:64px;height:64px;object-fit:cover;border-radius:8px;display:block}
+  .item .nome{font-size:12px;line-height:1.3;min-width:0}
+  .item .nome b{display:block;font-size:12px;color:var(--amarelo)}
+  .item .nome span{color:var(--texto-2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .acoes{display:flex;gap:4px}
+  .ic{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);
+    cursor:pointer;display:grid;place-items:center;font-size:14px;line-height:1}
+  .ic:hover{border-color:var(--amarelo);color:var(--amarelo)}
+  .ic:disabled{opacity:.3;cursor:default}
+  .ajuste{grid-column:1/-1;display:none;gap:10px;align-items:center;font-size:11px;color:var(--texto-2);padding:4px 2px 0}
+  .item.sel .ajuste{display:flex}
+  .ajuste input[type=range]{flex:1;accent-color:var(--amarelo)}
+
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+  .galeria button{position:relative;padding:0;border:0;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:#000}
+  .galeria img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s}
+  .galeria button:hover img{opacity:.6}
+  .galeria button::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;font-size:28px;font-weight:700;
+    color:var(--amarelo);opacity:0;transition:opacity .15s}
+  .galeria button:hover::after{opacity:1}
+  .galeria .leg{position:absolute;left:0;right:0;bottom:0;padding:3px 5px;font-size:9px;text-align:left;color:#fff;
+    background:linear-gradient(transparent,rgba(0,0,0,.8));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vazio{font-size:12px;color:var(--texto-2);margin:0}
+  .linha{display:flex;gap:8px;margin-top:12px}
+  .linha input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.35);outline:none;font-size:13px}
+  .drop{margin-top:10px;border:2px dashed var(--borda);border-radius:12px;padding:14px;text-align:center;font-size:12px;color:var(--texto-2)}
+  .drop.on{border-color:var(--amarelo);background:rgba(253,185,19,.06)}
+  .drop label{color:var(--amarelo);cursor:pointer;text-decoration:underline}
+  body.arrastando .drop{border-color:var(--amarelo)}
+</style>
+</head>
+<body>
+<header>
+  <img id="logoKV" alt="Black November Roque Imóveis">
+  <div>
+    <h1>Gerador de carrossel</h1>
+    <p>Black November · Roque Imóveis</p>
+  </div>
+  <form class="busca" id="formBusca">
+    <input id="link" type="url" placeholder="Cole aqui o link do imóvel (roqueimoveis.com.br/imovel/...)" autocomplete="off" required>
+    <button class="btn" id="btnBuscar" type="submit">Gerar carrossel</button>
+  </form>
+</header>
+
+<div class="aviso" id="aviso"></div>
+
+<main>
+  <section>
+    <div class="painel-titulo">
+      <h2>Carrossel</h2><small id="contagem"></small><span class="sp"></span>
+      <button class="btn" id="btnZip">Baixar todos (.zip)</button>
+    </div>
+    <div class="trilho" id="trilho"></div>
+    <p class="dica">Arraste a foto dentro de um card para reenquadrar · duplo clique centraliza · clique para editar na lateral.</p>
+  </section>
+
+  <aside>
+    <div class="bloco">
+      <h3>Textos do card de capa</h3>
+      <div class="campos">
+        <div class="campo"><label for="fStatus">Selo</label><input id="fStatus" data-k="status"></div>
+        <div class="campo"><label for="fCodigo">Código</label><input id="fCodigo" data-k="codigo"></div>
+        <div class="campo full"><label for="fTipo">Tipo do imóvel</label><input id="fTipo" data-k="tipo"></div>
+        <div class="campo full"><label for="fLocal">Bairro • Cidade</label><input id="fLocal" data-k="local"></div>
+        <div class="campo"><label for="fArea">Metragem (m²)</label><input id="fArea" data-k="area"></div>
+        <div class="campo"><label for="fQuartos">Quartos</label><input id="fQuartos" data-k="quartos"></div>
+        <div class="campo"><label for="fSuites">Suítes</label><input id="fSuites" data-k="suites"></div>
+        <div class="campo"><label for="fVagas">Vagas</label><input id="fVagas" data-k="vagas"></div>
+        <div class="campo full"><label for="fLinha">Linha de características (opcional, substitui a automática)</label>
+          <input id="fLinha" data-k="linha" placeholder=""><small id="linhaAuto"></small></div>
+        <div class="campo"><label for="fDe">Preço “DE” (R$)</label><input id="fDe" data-k="de" inputmode="decimal" placeholder="vazio = não mostra"></div>
+        <div class="campo"><label for="fPor">Preço “POR” (R$)</label><input id="fPor" data-k="por" inputmode="decimal"></div>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <h3>Fotos do carrossel</h3>
+      <div class="lista" id="lista"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Adicionar fotos</h3>
+      <div class="galeria" id="galeria"></div>
+      <p class="vazio" id="galeriaVazia">As outras fotos do imóvel aparecem aqui depois de gerar o carrossel.</p>
+      <form class="linha" id="formUrlFoto">
+        <input id="urlFoto" type="url" placeholder="Link de uma imagem (https://...)">
+        <button class="btn sec peq" type="submit">Adicionar</button>
+      </form>
+      <div class="drop" id="drop">Arraste imagens para cá ou <label for="arquivos">escolha do computador</label>
+        <input id="arquivos" type="file" accept="image/*" multiple hidden></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+/* ============ Constantes do modelo (Figma: Roque Imóveis › MODELO_IMÓVEL, 1080×1440) ============ */
+const W = 1080, H = 1440;
+const FOTO_CAPA = { x: 0, y: 117, w: 1080, h: 1133, poly: [[0, 208.2], [1080, 117.7], [1080, 1250], [0, 1250]] };
+const AMARELO = '#fdb913', ROXO = '#5e113f';
+const FONTE = 'PoppinsBN';
+const N_FOTOS_PADRAO = 5;           // cards só com foto, além da capa
+const SERVIDOR = location.protocol.startsWith('http');
+
+const $ = s => document.querySelector(s);
+const estado = {
+  dados: { status: 'VENDA', codigo: 'XXXXXX', tipo: 'APARTAMENTO', local: 'Bairro • Cidade',
+           area: 'XX', quartos: 'X', suites: '', vagas: 'X', linha: '', de: '300.000,00', por: '250.000,00' },
+  slides: [],     // [{id, src, desc, zoom, px, py}] — slides[0] é a capa
+  biblioteca: [], // todas as fotos disponíveis [{src, desc}]
+  sel: 0,
+};
+let seq = 0;
+
+/* ============ Recursos (camadas do Figma embutidas em assets.js) ============ */
+const imgs = {};
+function carregarImg(src) {
+  if (imgs[src]) return imgs[src];
+  const p = new Promise((ok, falha) => {
+    const tentar = (url, ultimo) => {
+      const im = new Image();
+      if (!/^(data|blob):/.test(url)) im.crossOrigin = 'anonymous';
+      im.onload = () => ok(im);
+      im.onerror = () => ultimo ? falha(new Error('imagem')) : tentar('/img?url=' + encodeURIComponent(src), true);
+      im.src = url;
+    };
+    // tenta direto (o CDN da Roque libera CORS); se falhar, passa pelo proxy /img do servidor
+    tentar(src, !SERVIDOR || !/^https?:/.test(src));
+  });
+  imgs[src] = p;
+  p.catch(() => { delete imgs[src]; });
+  return p;
+}
+const camadas = {};
+async function prepararRecursos() {
+  const fontes = [['200', 'normal', 'poppins200'], ['300', 'italic', 'poppins300i'], ['400', 'normal', 'poppins400'],
+                  ['700', 'normal', 'poppins700'], ['800', 'normal', 'poppins800']];
+  await Promise.all(fontes.map(async ([weight, style, k]) => {
+    const f = new FontFace(FONTE, `url(${ASSETS[k]})`, { weight, style });
+    await f.load(); document.fonts.add(f);
+  }));
+  for (const k of ['fundo', 'faixa', 'kv', 'glow1', 'glow2']) camadas[k] = await carregarImg(ASSETS[k]);
+  $('#logoKV').src = ASSETS.kv;
+}
+
+/* ============ Desenho ============ */
+function desenharFoto(ctx, slide, im, r) {
+  const s = Math.max(r.w / im.width, r.h / im.height) * slide.zoom;
+  const w = im.width * s, h = im.height * s;
+  const ox = w - r.w, oy = h - r.h;
+  slide._area = { ox, oy, w: r.w };
+  ctx.drawImage(im, r.x - ox * slide.px, r.y - oy * slide.py, w, h);
+}
+function placeholder(ctx, r) {
+  ctx.fillStyle = '#2a0a1d'; ctx.fillRect(r.x, r.y, r.w, r.h);
+  ctx.strokeStyle = 'rgba(253,185,19,.08)'; ctx.lineWidth = 28;
+  for (let x = -r.h; x < r.w + r.h; x += 80) { ctx.beginPath(); ctx.moveTo(x, r.y); ctx.lineTo(x + r.h, r.y + r.h); ctx.stroke(); }
+  ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.font = `400 34px ${FONTE}`; ctx.textAlign = 'center';
+  ctx.fillText('Foto do imóvel', r.x + r.w / 2, r.y + r.h / 2 + 30); ctx.textAlign = 'left';
+}
+function fonte(ctx, peso, tam, texto, maxW, estilo = 'normal') {
+  let t = tam;
+  do { ctx.font = `${estilo} ${peso} ${t}px ${FONTE}`; } while (ctx.measureText(texto).width > maxW && (t -= 1) > tam * 0.45);
+  return t;
+}
+const plural = (n, um, varios) => `${n} ${String(n).trim() === '1' ? um : varios}`;
+function linhaCaracteristicas(d) {
+  const p = [];
+  if (vale(d.area)) p.push(`${d.area.trim()} m²`);
+  if (vale(d.quartos)) p.push(plural(d.quartos.trim(), 'quarto', 'quartos'));
+  if (vale(d.suites)) p.push(plural(d.suites.trim(), 'suíte', 'suítes'));
+  if (vale(d.vagas)) p.push(plural(d.vagas.trim(), 'vaga', 'vagas'));
+  return p.join(' | ');
+}
+const vale = v => v != null && String(v).trim() !== '' && String(v).trim() !== '0';
+
+function desenharCapa(ctx, slide, im) {
+  const d = estado.dados;
+  ctx.drawImage(camadas.fundo, 0, 0, W, H);
+  // foto na área quadriculada (borda superior inclinada do modelo)
+  ctx.save(); ctx.beginPath(); FOTO_CAPA.poly.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); ctx.clip();
+  im ? desenharFoto(ctx, slide, im, FOTO_CAPA) : placeholder(ctx, FOTO_CAPA);
+  ctx.restore();
+  ctx.drawImage(camadas.faixa, 0, 0, W, H);
+
+  // selo VENDA
+  ctx.fillStyle = AMARELO; ctx.beginPath(); ctx.roundRect(-95, 1086, 369, 55, 27.5); ctx.fill();
+  ctx.fillStyle = ROXO; ctx.textAlign = 'center';
+  fonte(ctx, 700, 35, d.status.toUpperCase(), 215); ctx.fillText(d.status.toUpperCase(), 156.5, 1129.5);
+  ctx.textAlign = 'left'; ctx.fillStyle = '#fff';
+  const cod = `CÓDIGO: ${d.codigo}`; fonte(ctx, 700, 21.2, cod, 330); ctx.fillText(cod, 301, 1128.5);
+
+  fonte(ctx, 200, 50, d.tipo.toUpperCase(), 546); ctx.fillText(d.tipo.toUpperCase(), 93, 1234.5);
+  fonte(ctx, 700, 33.9, d.local, 530); ctx.fillText(d.local, 93, 1284);
+  const linha = d.linha.trim() || linhaCaracteristicas(d);
+  ctx.fillStyle = AMARELO; fonte(ctx, 400, 29.7, linha, 546); ctx.fillText(linha, 93, 1358);
+
+  // preços
+  ctx.fillStyle = '#fff';
+  const maxP = W - 652 - 36;
+  if (vale(d.de)) {
+    const valor = ' ' + d.de.trim();
+    let t1 = 30, t2 = 40;
+    ctx.font = `italic 300 ${t1}px ${FONTE}`; let w1 = ctx.measureText('DE R$').width;
+    ctx.font = `italic 300 ${t2}px ${FONTE}`; let w2 = ctx.measureText(valor).width;
+    const k = Math.min(1, maxP / (w1 + w2)); t1 *= k; t2 *= k;
+    ctx.font = `italic 300 ${t1}px ${FONTE}`; ctx.fillText('DE R$', 650, 1226); w1 = ctx.measureText('DE R$').width;
+    ctx.font = `italic 300 ${t2}px ${FONTE}`; ctx.fillText(valor, 650 + w1, 1226);
+  }
+  ctx.font = `normal 800 40px ${FONTE}`; ctx.fillText('POR R$', 652, 1297);
+  fonte(ctx, 700, 60, d.por.trim(), maxP); ctx.fillText(d.por.trim(), 652, 1361);
+
+  // KV com brilho (modo sobreposição, como no Figma)
+  ctx.save(); ctx.globalCompositeOperation = 'overlay';
+  ctx.drawImage(camadas.glow1, -236.08, -246.37, 995.73, 995.73);
+  ctx.drawImage(camadas.glow2, -129.12, -139.41, 781.82, 781.82);
+  ctx.restore();
+  ctx.drawImage(camadas.kv, -66, -70, 654.95, 612.8);
+}
+function desenharSoFoto(ctx, slide, im) {
+  const r = { x: 0, y: 0, w: W, h: H };
+  im ? desenharFoto(ctx, slide, im, r) : placeholder(ctx, r);
+}
+async function desenhar(i) {
+  const slide = estado.slides[i], cv = document.querySelector(`canvas[data-i="${i}"]`);
+  if (!cv) return;
+  let im = null;
+  if (slide && slide.src) { try { im = await carregarImg(slide.src); } catch { im = null; } }
+  if (estado.slides[i] !== slide) return;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  (i === 0 ? desenharCapa : desenharSoFoto)(ctx, slide || { zoom: 1, px: .5, py: .5 }, im);
+}
+
+/* ============ Interface ============ */
+function novoSlide(foto) { return { id: ++seq, src: foto.src, desc: foto.desc || '', zoom: 1, px: .5, py: .5 }; }
+
+function montarTrilho() {
+  const tr = $('#trilho'); tr.innerHTML = '';
+  const total = Math.max(estado.slides.length, 1);
+  for (let i = 0; i < total; i++) {
+    const card = document.createElement('div'); card.className = 'card' + (i === estado.sel ? ' sel' : '');
+    card.innerHTML = `<canvas width="${W}" height="${H}" data-i="${i}"></canvas>
+      <div class="rodape"><b>${String(i + 1).padStart(2, '0')}</b><span>${i === 0 ? 'Capa' : 'Foto'}</span><span class="sp"></span>
+      <button class="btn sec peq" data-baixar="${i}">PNG</button></div>`;
+    tr.appendChild(card);
+    ligarArraste(card.querySelector('canvas'), i);
+    desenhar(i);
+  }
+  $('#contagem').textContent = estado.slides.length ? `${estado.slides.length} cards · 1080×1440` : '';
+}
+function selecionar(i) {
+  estado.sel = i;
+  document.querySelectorAll('.card').forEach((c, j) => c.classList.toggle('sel', j === i));
+  document.querySelectorAll('.item').forEach((c, j) => c.classList.toggle('sel', j === i));
+}
+function montarLista() {
+  const ls = $('#lista'); ls.innerHTML = '';
+  if (!estado.slides.length) { ls.innerHTML = '<p class="vazio">Nenhuma foto ainda.</p>'; return; }
+  estado.slides.forEach((s, i) => {
+    const el = document.createElement('div'); el.className = 'item' + (i === estado.sel ? ' sel' : '');
+    el.innerHTML = `<img alt=""><div class="nome"><b>${i === 0 ? 'Capa' : 'Card ' + String(i + 1).padStart(2, '0')}</b><span></span></div>
+      <div class="acoes">
+        <button class="ic" title="Usar como capa" data-a="capa" ${i === 0 ? 'disabled' : ''}>★</button>
+        <button class="ic" title="Subir" data-a="sobe" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="ic" title="Descer" data-a="desce" ${i === estado.slides.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="ic" title="Remover" data-a="rem">✕</button></div>
+      <div class="ajuste">Zoom <input type="range" min="1" max="3" step="0.01" value="${s.zoom}">
+        <button class="ic" title="Centralizar" data-a="reset">⟲</button></div>`;
+    el.querySelector('img').src = s.src;
+    el.querySelector('.nome span').textContent = s.desc || 'Foto';
+    el.addEventListener('click', e => {
+      const a = e.target.closest('[data-a]')?.dataset.a;
+      if (e.target.type === 'range') return;
+      if (!a) { selecionar(i); document.querySelectorAll('.card')[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); return; }
+      const sl = estado.slides;
+      if (a === 'capa') { sl.unshift(sl.splice(i, 1)[0]); estado.sel = 0; }
+      if (a === 'sobe') { [sl[i - 1], sl[i]] = [sl[i], sl[i - 1]]; estado.sel = i - 1; }
+      if (a === 'desce') { [sl[i + 1], sl[i]] = [sl[i], sl[i + 1]]; estado.sel = i + 1; }
+      if (a === 'rem') { sl.splice(i, 1); estado.sel = Math.max(0, Math.min(estado.sel, sl.length - 1)); }
+      if (a === 'reset') { Object.assign(s, { zoom: 1, px: .5, py: .5 }); el.querySelector('input').value = 1; desenhar(i); return; }
+      atualizarTudo();
+    });
+    el.querySelector('input[type=range]').addEventListener('input', e => { s.zoom = +e.target.value; desenhar(i); });
+    ls.appendChild(el);
+  });
+}
+function montarGaleria() {
+  const g = $('#galeria'); g.innerHTML = '';
+  const usadas = new Set(estado.slides.map(s => s.src));
+  const livres = estado.biblioteca.filter(f => !usadas.has(f.src));
+  $('#galeriaVazia').style.display = livres.length ? 'none' : '';
+  $('#galeriaVazia').textContent = estado.biblioteca.length ? 'Todas as fotos do imóvel já estão no carrossel.'
+    : 'As outras fotos do imóvel aparecem aqui depois de gerar o carrossel.';
+  livres.forEach(f => {
+    const b = document.createElement('button'); b.type = 'button'; b.title = 'Adicionar ao carrossel' + (f.desc ? ` — ${f.desc}` : '');
+    b.innerHTML = '<img alt="" loading="lazy">' + (f.desc ? '<span class="leg"></span>' : '');
+    b.querySelector('img').src = f.src; if (f.desc) b.querySelector('.leg').textContent = f.desc;
+    b.onclick = () => { estado.slides.push(novoSlide(f)); estado.sel = estado.slides.length - 1; atualizarTudo(true); };
+    g.appendChild(b);
+  });
+}
+function atualizarTudo(rolarFim) {
+  montarTrilho(); montarLista(); montarGaleria();
+  if (rolarFim) $('#trilho').scrollTo({ left: $('#trilho').scrollWidth, behavior: 'smooth' });
+}
+function preencherCampos() {
+  document.querySelectorAll('[data-k]').forEach(inp => { inp.value = estado.dados[inp.dataset.k] ?? ''; });
+  $('#linhaAuto').textContent = 'Automática: ' + (linhaCaracteristicas(estado.dados) || '—');
+}
+document.querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('input', () => {
+  estado.dados[inp.dataset.k] = inp.value;
+  $('#linhaAuto').textContent = 'Automática: ' + (linhaCaracteristicas(estado.dados) || '—');
+  desenhar(0);
+}));
+
+/* Arrastar a foto dentro do card para reenquadrar */
+function ligarArraste(cv, i) {
+  let ini = null;
+  cv.addEventListener('pointerdown', e => {
+    selecionar(i); const s = estado.slides[i]; if (!s) return;
+    ini = { x: e.clientX, y: e.clientY, px: s.px, py: s.py, esc: W / cv.clientWidth }; cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', e => {
+    const s = estado.slides[i]; if (!ini || !s || !s._area) return;
+    const dx = (e.clientX - ini.x) * ini.esc, dy = (e.clientY - ini.y) * ini.esc;
+    s.px = s._area.ox > 0 ? Math.min(1, Math.max(0, ini.px - dx / s._area.ox)) : .5;
+    s.py = s._area.oy > 0 ? Math.min(1, Math.max(0, ini.py - dy / s._area.oy)) : .5;
+    desenhar(i);
+  });
+  const fim = () => { ini = null; };
+  cv.addEventListener('pointerup', fim); cv.addEventListener('pointercancel', fim);
+  cv.addEventListener('dblclick', () => { const s = estado.slides[i]; if (s) { s.px = s.py = .5; desenhar(i); } });
+}
+
+/* ============ Busca e leitura da página do imóvel ============ */
+function aviso(tipo, html) { const a = $('#aviso'); a.className = 'aviso on ' + tipo; a.innerHTML = html; }
+function esconderAviso() { $('#aviso').className = 'aviso'; }
+
+function extrairObjeto(html, chave) {
+  let i = html.indexOf(chave); if (i < 0) return null;
+  i = html.indexOf('{', i);
+  let prof = 0, str = false, esc = false;
+  for (let j = i; j < html.length; j++) {
+    const c = html[j];
+    if (str) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') str = false; continue; }
+    if (c === '"') str = true; else if (c === '{') prof++;
+    else if (c === '}' && --prof === 0) { try { return JSON.parse(html.slice(i, j + 1)); } catch { return null; } }
+  }
+  return null;
+}
+const moeda = v => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const semQuery = u => u.split('?')[0];
+
+function lerImovel(html, url) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const meta = p => doc.querySelector(`meta[property="${p}"]`)?.content || '';
+  const d = extrairObjeto(html, 'imovelDataLayer=');
+  const fotos = [], vistos = new Set();
+  const add = (src, desc) => {
+    if (!src) return; src = src.replace(/^\/\//, 'https://');
+    const k = semQuery(src); if (vistos.has(k)) return; vistos.add(k);
+    fotos.push({ src, desc: (desc || '').replace(/^.*?:\s*/, '').trim() });
+  };
+  (d?.Foto || []).forEach(f => add(f.Foto || f.urlm, f.Descricao));
+  doc.querySelectorAll('#lightgallery [data-src]').forEach(el => add(el.getAttribute('data-src')));
+  if (!fotos.length) add(meta('og:image'));
+
+  if (!d) {
+    const titulo = meta('og:title') || doc.title || '';
+    return { dados: { status: 'VENDA', codigo: (url.match(/\/(\d{3,})\//) || [])[1] || '', tipo: titulo.split('|')[0].trim(),
+      local: '', area: '', quartos: '', suites: '', vagas: '', linha: '', de: '', por: '' }, fotos, parcial: true };
+  }
+  const status = /loca|alug/i.test(d.Status || '') ? 'LOCAÇÃO' : 'VENDA';
+  const valor = status === 'VENDA' ? (d.ValorVenda || d.ValorLocacao) : (d.ValorLocacao || d.ValorAluguel || d.ValorVenda);
+  const area = +d.AreaPrivativa || +d.AreaTotal || 0;
+  return {
+    dados: {
+      status, codigo: String(d.Codigo || ''),
+      tipo: (d.Categoria || d.CategoriaOrigin || 'Imóvel').toUpperCase(),
+      local: [d.Bairro, d.Cidade].filter(Boolean).join(' • '),
+      area: area ? String(Math.round(area)) : '',
+      quartos: vale(d.Dormitorios) ? String(d.Dormitorios) : '',
+      suites: '',
+      vagas: vale(d.Vagas) ? String(d.Vagas) : '',
+      linha: '', de: '', por: valor ? moeda(valor) : '',
+    }, fotos, parcial: false,
+  };
+}
+
+async function buscarHtml(url) {
+  if (!SERVIDOR) throw new Error('sem-servidor');
+  const r = await fetch('/buscar?url=' + encodeURIComponent(url));
+  if (r.status === 404 || r.status === 405) throw new Error('sem-servidor');
+  if (!r.ok) throw new Error((await r.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200));
+  return r.text();
+}
+function aplicarImovel(res) {
+  estado.dados = res.dados;
+  estado.biblioteca = res.fotos;
+  estado.slides = res.fotos.slice(0, 1 + N_FOTOS_PADRAO).map(novoSlide);
+  estado.sel = 0;
+  preencherCampos(); atualizarTudo();
+  $('#trilho').scrollTo({ left: 0 });
+  const faltas = [];
+  if (!res.dados.de) faltas.push('o preço <b>“DE”</b> (fica oculto enquanto estiver vazio)');
+  if (res.parcial) faltas.push('os dados do imóvel (só encontrei título e fotos)');
+  aviso('ok', `Pronto: ${res.fotos.length} fotos encontradas, ${estado.slides.length} cards gerados.` +
+    (faltas.length ? ` Confira na lateral ${faltas.join(' e ')}.` : ''));
+}
+function pedirCodigoFonte(url, motivo) {
+  aviso('info', `${motivo}<br>Alternativa: abra o <a href="${url.replace(/"/g, '')}" target="_blank" rel="noopener" style="color:var(--amarelo)">link do imóvel</a>,
+    pressione <code>⌘ + Option + U</code> (ver código-fonte), depois <code>⌘ + A</code> e <code>⌘ + C</code>, e cole abaixo:
+    <textarea id="fonteColada" placeholder="Cole aqui o código-fonte da página"></textarea>
+    <button class="btn peq" id="btnFonte">Usar código colado</button>`);
+  $('#btnFonte').onclick = () => {
+    const html = $('#fonteColada').value;
+    if (!/imovelDataLayer|lightgallery|og:image/.test(html)) return alert('Não encontrei os dados do imóvel nesse texto. Copie o código-fonte inteiro da página.');
+    aplicarImovel(lerImovel(html, url));
+  };
+}
+$('#formBusca').addEventListener('submit', async e => {
+  e.preventDefault();
+  const url = $('#link').value.trim();
+  if (!/roqueimoveis\.com\.br\//i.test(url)) return aviso('erro', 'Use um link de imóvel do site <b>roqueimoveis.com.br</b>.');
+  const btn = $('#btnBuscar'); btn.disabled = true; btn.textContent = 'Buscando…'; esconderAviso();
+  try {
+    const html = await buscarHtml(url);
+    const res = lerImovel(html, url);
+    if (!res.fotos.length) throw new Error('Não encontrei fotos nessa página. Confira se o link é de um imóvel.');
+    aplicarImovel(res);
+  } catch (err) {
+    pedirCodigoFonte(url, err.message !== 'sem-servidor' ? 'Não consegui buscar a página: ' + err.message
+      : SERVIDOR ? 'A busca automática do link não está ativa neste endereço.'
+      : 'Para buscar o link automaticamente, abra o gerador pelo arquivo <b>ABRIR_GERADOR.command</b> (ele liga um servidorzinho local).');
+  } finally { btn.disabled = false; btn.textContent = 'Gerar carrossel'; }
+});
+
+/* ============ Adicionar fotos ============ */
+function adicionarFotos(lista) {
+  lista.forEach(f => { estado.biblioteca.push(f); estado.slides.push(novoSlide(f)); });
+  estado.sel = estado.slides.length - 1; atualizarTudo(true);
+}
+function arquivosParaFotos(files) {
+  const fotos = [...files].filter(f => f.type.startsWith('image/')).map(f => ({ src: URL.createObjectURL(f), desc: f.name }));
+  if (fotos.length) adicionarFotos(fotos);
+}
+$('#arquivos').addEventListener('change', e => { arquivosParaFotos(e.target.files); e.target.value = ''; });
+$('#formUrlFoto').addEventListener('submit', async e => {
+  e.preventDefault(); const src = $('#urlFoto').value.trim(); if (!src) return;
+  try { await carregarImg(src); adicionarFotos([{ src, desc: 'Imagem por link' }]); $('#urlFoto').value = ''; }
+  catch { aviso('erro', 'Não consegui carregar essa imagem pelo link. Baixe a imagem e arraste o arquivo para cá.'); }
+});
+let contaArraste = 0;
+addEventListener('dragenter', e => { if (e.dataTransfer?.types?.includes('Files')) { contaArraste++; document.body.classList.add('arrastando'); } });
+addEventListener('dragleave', () => { if (--contaArraste <= 0) { contaArraste = 0; document.body.classList.remove('arrastando'); } });
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  e.preventDefault(); contaArraste = 0; document.body.classList.remove('arrastando');
+  if (e.dataTransfer?.files?.length) arquivosParaFotos(e.dataTransfer.files);
+});
+
+/* ============ Exportar ============ */
+const nomeArquivo = i => `BN_ROQUE_${(estado.dados.codigo || 'imovel').replace(/[^\w-]/g, '')}_${String(i + 1).padStart(2, '0')}.png`;
+const pngDe = i => new Promise((ok, falha) => {
+  const cv = document.querySelector(`canvas[data-i="${i}"]`);
+  try { cv.toBlob(b => b ? ok(b) : falha(new Error('png')), 'image/png'); } catch (e) { falha(e); }
+});
+function baixar(blob, nome) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const erroExport = () => aviso('erro', 'O navegador bloqueou a exportação de uma das fotos (imagem de outro site). Abra pelo <b>ABRIR_GERADOR.command</b> ou baixe a foto e arraste o arquivo.');
+$('#trilho').addEventListener('click', async e => {
+  const b = e.target.closest('[data-baixar]'); if (!b) return;
+  const i = +b.dataset.baixar; try { baixar(await pngDe(i), nomeArquivo(i)); } catch { erroExport(); }
+});
+function carregarJSZip() {
+  if (window.JSZip) return Promise.resolve(window.JSZip);
+  return new Promise((ok, falha) => {
+    const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = () => ok(window.JSZip); s.onerror = falha; document.head.appendChild(s);
+  });
+}
+$('#btnZip').addEventListener('click', async () => {
+  const n = estado.slides.length; if (!n) return aviso('info', 'Gere o carrossel primeiro colando o link do imóvel.');
+  const btn = $('#btnZip'); btn.disabled = true; btn.textContent = 'Gerando…';
+  try {
+    const blobs = []; for (let i = 0; i < n; i++) blobs.push(await pngDe(i));
+    try {
+      const JSZip = await carregarJSZip(); const zip = new JSZip();
+      blobs.forEach((b, i) => zip.file(nomeArquivo(i), b));
+      baixar(await zip.generateAsync({ type: 'blob' }), `BN_ROQUE_${estado.dados.codigo || 'imovel'}_carrossel.zip`);
+    } catch { for (let i = 0; i < n; i++) { baixar(blobs[i], nomeArquivo(i)); await new Promise(r => setTimeout(r, 350)); } }
+  } catch { erroExport(); }
+  finally { btn.disabled = false; btn.textContent = 'Baixar todos (.zip)'; }
+});
+
+/* ============ Início ============ */
+(async () => {
+  await prepararRecursos();
+  preencherCampos(); atualizarTudo();
+  if (!SERVIDOR) aviso('info', 'Dica: abra pelo <b>ABRIR_GERADOR.command</b> para que o link do imóvel seja lido automaticamente. Aberto direto, o gerador pede o código-fonte da página.');
+  const q = new URLSearchParams(location.search).get('link');
+  if (q) { $('#link').value = q; $('#formBusca').requestSubmit(); }
+})();
+</script>
+</body>
+</html>

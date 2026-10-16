@@ -1,0 +1,10 @@
+# Gerador de Carrossel Black November — Roque Imóveis
+# Site estático (sem build) + 2 funções que buscam a página do imóvel e fotos (contornam o CORS).
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

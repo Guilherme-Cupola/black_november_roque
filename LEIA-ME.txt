@@ -1,0 +1,21 @@
+GERADOR DE CARROSSEL BLACK NOVEMBER — VERSÃO NETLIFY
+
+Conteúdo
+  index.html                     o gerador
+  assets/assets.js               camadas do Figma + fontes Poppins (embutidas)
+  netlify/functions/buscar.mjs   lê a página do imóvel (substitui o servidor.py)
+  netlify/functions/img.mjs      repassa imagens de outros sites (para exportar o PNG)
+  netlify.toml                   configuração (sem build)
+
+Como publicar
+  A) Com busca automática do link (recomendado): GitHub ou Netlify CLI
+     - GitHub: suba esta pasta num repositório > Netlify > Add new site > Import from Git.
+       Build command: vazio · Publish directory: .  (o netlify.toml já configura tudo)
+     - CLI: na pasta, rode  netlify deploy --prod
+
+  B) Arrastar a pasta em app.netlify.com/drop
+     O site funciona, mas as funções NÃO são publicadas nesse modo: ao colar o link,
+     o gerador pede para colar o código-fonte da página do imóvel (⌘+Option+U, ⌘+A, ⌘+C).
+
+Teste depois de publicar: abra  https://SEU-SITE.netlify.app/buscar?url=https://roqueimoveis.com.br
+  Se aparecer o HTML do site da Roque, a busca automática está ativa.
